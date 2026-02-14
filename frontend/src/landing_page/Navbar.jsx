@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Navbar() {
+  const { user, isAuthenticated } = useAuth();
+
   return (
     <nav className="navbar navbar-expand-lg border-bottom" style={{ backgroundColor: "#FFF" }}>
       <div className="container p-2">
@@ -25,9 +28,27 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
 
-            <li className="nav-item">
-              <Link className="nav-link active" to="/signup">Signup</Link>
-            </li>
+            {!isAuthenticated ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/signup">Signup</Link>
+                </li>
+
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">Login</Link>
+                </li>
+              </>
+            ) : (
+              <li className="nav-item">
+                <a 
+                  className="nav-link" 
+                  href="http://localhost:5174"
+                  style={{ color: '#387ed1', fontWeight: 'bold' }}
+                >
+                  Dashboard →
+                </a>
+              </li>
+            )}
 
             <li className="nav-item">
               <Link className="nav-link" to="/about">About</Link>
