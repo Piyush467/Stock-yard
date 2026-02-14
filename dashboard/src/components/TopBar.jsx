@@ -26,6 +26,9 @@ const TopBar = () => {
       </div>
 
       {/* Right side - User info and Menu */}
+
+      <Menu />
+      
       <div style={{ 
         display: 'flex', 
         alignItems: 'center',
@@ -41,16 +44,9 @@ const TopBar = () => {
             borderLeft: '1px solid #333'
           }}>
             <div style={{ textAlign: 'right' }}>
+          
               <div style={{ 
                 color: '#00d09c',
-                fontSize: '12px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                User
-              </div>
-              <div style={{ 
-                color: '#fff',
                 fontSize: '14px',
                 fontWeight: '500'
               }}>
@@ -100,7 +96,7 @@ const TopBar = () => {
           </div>
         )}
         
-        <Menu />
+       
       </div>
     </div>
   );
