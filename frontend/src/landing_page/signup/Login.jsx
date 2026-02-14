@@ -42,7 +42,7 @@ function Login() {
           <div className="card shadow-sm">
             <div className="card-body p-5">
               <div className="text-center mb-4">
-                <img src="media/logo.svg" alt="Zerodha" style={{ width: '150px' }} />
+                <img src="media/logo.svg" alt="Zerodha" style={{ width: '70%' }} />
                 <h4 className="mt-3 text-muted">Login to Kite</h4>
               </div>
 

@@ -63,11 +63,11 @@ function Signup() {
   };
 
   return (
-    <div className="container mt-5 mb-5">
+    <div className="container mt-5 mb-5 ">
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="text-center mb-4">
-            <img src="media/logo.svg" alt="Zerodha" style={{ width: '200px' }} />
+            <img src="media/logo.svg" alt="Zerodha" style={{ width: '50%' }} />
             <h2 className="mt-4">Sign up now</h2>
             <p className="text-muted">Or track your existing application.</p>
           </div>
@@ -115,7 +115,7 @@ function Signup() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="9876543210"
+                  placeholder="XXXXXXXXXX"
                   maxLength="10"
                   required
                 />

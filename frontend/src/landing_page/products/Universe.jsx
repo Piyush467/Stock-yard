@@ -5,7 +5,7 @@ function Universe() {
     return ( 
           <div className="container mb-5 mt-5">
       <div className="row text-center mt-5">
-        <h1 className="fs-4">The Zerodha Universe</h1>
+        <h1 className="fs-4">The StockYard Universe</h1>
         <p>
           Extend your trading and investment experience even further with our
           partner platforms

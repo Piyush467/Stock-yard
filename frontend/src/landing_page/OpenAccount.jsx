@@ -6,7 +6,7 @@ function OpenAccount() {
         <div className='container p-5 mt-5'>
             <div className='row text-center'>
                 <h1 className='mt-5'>
-                   Open a Zerodha account
+                   Open a StockYard account
                 </h1>
                 <p>
                 Modern platforms and apps, ₹0 investments, and flat ₹20 intraday and F&O traders.
