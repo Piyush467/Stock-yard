@@ -7,7 +7,9 @@ function Hero() {
                 <img src='media/homeHero.png' className='mb-5' alt='Hero Image'/>
                 <h1 className='mt-5'>Invest in everything</h1>
                 <p>Online platform to invest in stocks, derivatives,mutual funds</p>
-                <button className='p-2 btn btn-primary fs-5 mb-5' style={{width:"20%",margin:"0 auto"}}>Signup Now</button>
+                <Link to="/signup" className="btn btn-primary" style={{ width: '200px', margin: '0 auto' }}>
+                    Sign up now
+                </Link>
                 
             </div>
             
