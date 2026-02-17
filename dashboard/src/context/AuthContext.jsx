@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
       await authService.logout();
       setUser(null);
       // Redirect to frontend login page
-      window.location.href = 'http://localhost:5173/login';
+      window.location.href = 'https://stockyard-frontend-uuyr.onrender.com/login';
     } catch (err) {
       console.error('Logout error:', err);
     }

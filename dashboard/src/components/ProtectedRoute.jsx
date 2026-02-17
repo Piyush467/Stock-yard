@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
 
   // If not authenticated, redirect to frontend login
   if (!user) {
-    window.location.href = 'http://localhost:5173/login';
+    window.location.href = 'https://stockyard-frontend-uuyr.onrender.com/login';
     return null;
   }
 
