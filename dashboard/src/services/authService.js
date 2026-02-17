@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3002/api/auth';
+const API_URL = 'https://stockyard-backend-o8uo.onrender.com/api/auth';
 
 // IMPORTANT: This allows cookies to be sent with requests
 axios.defaults.withCredentials = true;

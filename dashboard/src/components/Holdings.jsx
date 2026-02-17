@@ -11,7 +11,7 @@ const Holdings = () => {
 
   //to execute one time only
   useEffect(() => {
-    axios.get("http://localhost:3002/allHoldings").then((res) => {
+    axios.get("https://stockyard-backend-o8uo.onrender.com/allHoldings").then((res) => {
       // console.log(res.data);
       setAllHoldings(res.data);
     });
