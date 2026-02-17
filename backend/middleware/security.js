@@ -3,50 +3,67 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
 const setupSecurity = (app) => {
-  // 1. Helmet - Secure HTTP headers
-  app.use(helmet());
-
-  // 2. CORS - Allow frontend and dashboard
+  // Define allowed origins
   const allowedOrigins = [
-    // Local development
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:3000',
-    // Production URLs 
-    process.env.FRONTEND_URL,
-    process.env.DASHBOARD_URL,
-    // Added deployed URLs directly as backup
     'https://stockyard-frontend-uuyr.onrender.com',
-    'https://stockyard-dashboard.onrender.com' 
-  ].filter(Boolean); // Remove undefined values
+    'https://stockyard-dashboard.onrender.com'
+  ];
 
+  // Add environment variables if they exist
+  if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+  }
+  if (process.env.DASHBOARD_URL) {
+    allowedOrigins.push(process.env.DASHBOARD_URL);
+  }
+
+  console.log('Allowed CORS origins:', allowedOrigins);
+
+  // CORS configuration
   const corsOptions = {
     origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, curl, etc.)
-      if (!origin) return callback(null, true);
+      console.log('Request from origin:', origin);
       
-      if (allowedOrigins.includes(origin)) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) {
+        console.log('No origin - allowing');
+        return callback(null, true);
+      }
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        console.log('Origin allowed:', origin);
         callback(null, true);
       } else {
-        console.log('CORS blocked origin:', origin);
-        callback(new Error('Not allowed by CORS'));
+        console.log('Origin BLOCKED:', origin);
+        callback(null, false);
       }
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-    optionsSuccessStatus: 200
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
+    exposedHeaders: ['Set-Cookie'],
+    optionsSuccessStatus: 204
   };
 
+  // Apply CORS
   app.use(cors(corsOptions));
 
-  // 3. Handle preflight requests
-  app.options('*', cors(corsOptions));
+  // Helmet with adjusted settings
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
+  }));
 
-  // 4. Rate Limiting
+  // Rate limiting with OPTIONS skip
   const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
+    skip: (req) => req.method === 'OPTIONS',
+    standardHeaders: true,
+    legacyHeaders: false,
     message: {
       success: false,
       message: 'Too many requests, please try again later'
@@ -54,10 +71,13 @@ const setupSecurity = (app) => {
   });
   app.use('/api/', generalLimiter);
 
-  // 5. Auth Rate Limiting
+  // Auth rate limiting
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
+    skip: (req) => req.method === 'OPTIONS',
+    standardHeaders: true,
+    legacyHeaders: false,
     message: {
       success: false,
       message: 'Too many login attempts, please try again later'

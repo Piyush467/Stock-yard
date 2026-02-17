@@ -3,19 +3,16 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');
 
-// Import security middleware
+// Import middleware
 const { setupSecurity } = require('./middleware/security');
 const errorHandler = require('./middleware/errorHandler');
-
-// Import auth middleware
 const { protect } = require('./middleware/auth');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 
-// Import your existing models
+// Import models
 const { HoldingsModel } = require('./model/HoldingsModel');
 const { PositionsModel } = require('./model/PositionsModel');
 const { OrdersModel } = require('./model/OrdersModel');
@@ -25,46 +22,44 @@ const uri = process.env.MONGO_URL;
 
 const app = express();
 
-// TRUST PROXY (Important for Render.com)
+// Trust proxy (CRITICAL for Render)
 app.set('trust proxy', 1);
 
-// SECURITY MIDDLEWARE (MUST BE FIRST!)
+// Security (CORS, Helmet, Rate Limiting) - MUST BE FIRST
 setupSecurity(app);
 
-// BODY PARSERS
+// Body parsers
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CUSTOM SANITIZATION MIDDLEWARE
+// Logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log('Origin:', req.get('origin'));
+  next();
+});
+
+// Sanitization
 const sanitizeInput = (req, res, next) => {
   const sanitize = (obj) => {
-    if (typeof obj !== 'object' || obj === null) {
-      return obj;
-    }
-    
+    if (typeof obj !== 'object' || obj === null) return obj;
     for (let key in obj) {
-      if (key.startsWith('$')) {
-        delete obj[key];
-      } else if (typeof obj[key] === 'object') {
-        obj[key] = sanitize(obj[key]);
-      }
+      if (key.startsWith('$')) delete obj[key];
+      else if (typeof obj[key] === 'object') obj[key] = sanitize(obj[key]);
     }
     return obj;
   };
-
   if (req.body) req.body = sanitize(req.body);
   if (req.query) req.query = sanitize(req.query);
   if (req.params) req.params = sanitize(req.params);
-  
   next();
 };
-
 app.use(sanitizeInput);
 
-// AUTH ROUTES (Public)
+// Routes
 app.use('/api/auth', authRoutes);
 
-// YOUR EXISTING ROUTES (Now Protected!)
 app.get("/allHoldings", protect, async (req, res) => {
   let allHoldings = await HoldingsModel.find({});
   res.json(allHoldings);
@@ -83,27 +78,38 @@ app.post("/newOrder", protect, async (req, res) => {
       price: req.body.price,
       mode: req.body.mode,
     });
-
     await newOrder.save();
-    res.send("Order saved!");
+    res.json({ success: true, message: "Order saved!" });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error saving order");
+    res.status(500).json({ success: false, message: "Error saving order" });
   }
 });
 
-// TEST ROUTE (Public)
 app.get("/", (req, res) => {
-  res.json({ message: "Zerodha Clone API is running..." });
+  res.json({ 
+    message: "Zerodha Clone API is running",
+    env: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
 });
 
-// ERROR HANDLER (MUST BE LAST!)
+// Error handler
 app.use(errorHandler);
 
-// DATABASE CONNECTION & SERVER START
+// Start server
 mongoose.connect(uri)
   .then(() => {
-    console.log("DB connected");
-    app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+    console.log("MongoDB connected");
+    console.log("Environment:", process.env.NODE_ENV);
+    console.log("Frontend URL:", process.env.FRONTEND_URL);
+    console.log("Dashboard URL:", process.env.DASHBOARD_URL);
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+      console.log(`Server started at ${new Date().toISOString()}`);
+    });
   })
-  .catch(err => console.log(err));
+  .catch(err => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  });

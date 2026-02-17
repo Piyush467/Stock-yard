@@ -11,12 +11,14 @@ const generateToken = (res, userId) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: isProduction,           // true in production (HTTPS)
-    sameSite: isProduction ? 'none' : 'lax',  // 'none' for cross-origin in production
-    maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
-    path: '/'
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/',
+    domain: isProduction ? '.onrender.com' : undefined
   };
 
+  console.log('Setting cookie with options:', cookieOptions);
   res.cookie('token', token, cookieOptions);
 
   return token;
