@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');   // ⭐ ADD THIS
 
 // Import security middleware
 const { setupSecurity } = require('./middleware/security');
@@ -27,20 +28,25 @@ const app = express();
 // SECURITY MIDDLEWARE (MUST BE FIRST!)
 setupSecurity(app);
 
+// ⭐ ADD CORS HERE
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://stockyard-frontend-uuyr.onrender.com"
+  ],
+  credentials: true
+}));
+
 // BODY PARSERS
 app.use(express.json());
 app.use(cookieParser());
 
 // CUSTOM SANITIZATION MIDDLEWARE
 const sanitizeInput = (req, res, next) => {
-  // Function to remove $ from keys only (prevents NoSQL injection)
   const sanitize = (obj) => {
-    if (typeof obj !== 'object' || obj === null) {
-      return obj;  // Don't modify strings, numbers, etc.
-    }
-    
+    if (typeof obj !== 'object' || obj === null) return obj;
+
     for (let key in obj) {
-      // Remove keys that start with $ (MongoDB operators)
       if (key.startsWith('$')) {
         delete obj[key];
       } else if (typeof obj[key] === 'object') {
@@ -53,27 +59,31 @@ const sanitizeInput = (req, res, next) => {
   if (req.body) req.body = sanitize(req.body);
   if (req.query) req.query = sanitize(req.query);
   if (req.params) req.params = sanitize(req.params);
-  
+
   next();
 };
+
+// ⭐ APPLY SANITIZATION
+app.use(sanitizeInput);
+
 // AUTH ROUTES (Public)
 app.use('/api/auth', authRoutes);
 
-// EXISTING ROUTES (Now Protected!)
+// EXISTING ROUTES (Protected)
 
-// Holdings - Protected route
+// Holdings
 app.get("/allHoldings", protect, async (req, res) => {
   let allHoldings = await HoldingsModel.find({});
   res.json(allHoldings);
 });
 
-// Positions - Protected route
+// Positions
 app.get("/allPositions", protect, async (req, res) => {
   let allPositions = await PositionsModel.find({});
   res.json(allPositions);
 });
 
-// New Order - Protected route
+// New Order
 app.post("/newOrder", protect, async (req, res) => {
   try {
     const newOrder = new OrdersModel({
@@ -91,16 +101,15 @@ app.post("/newOrder", protect, async (req, res) => {
   }
 });
 
-// TEST ROUTE (Public)
+// TEST ROUTE
 app.get("/", (req, res) => {
   res.json({ message: "Zerodha Clone API is running..." });
 });
 
-// ERROR HANDLER (MUST BE LAST!)
+// ERROR HANDLER (LAST)
 app.use(errorHandler);
 
-
-// DATABASE CONNECTION & SERVER START
+// DATABASE CONNECTION
 mongoose.connect(uri)
   .then(() => {
     console.log("DB connected");
