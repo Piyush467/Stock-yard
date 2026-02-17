@@ -102,7 +102,7 @@ function Login() {
                 <hr className="my-4" />
 
                 <div className="text-center">
-                  <span className="text-muted">New to Zerodha? </span>
+                  <span className="text-muted">New to StockYard? </span>
                   <Link to="/signup" className="text-primary">Create an account</Link>
                 </div>
               </form>

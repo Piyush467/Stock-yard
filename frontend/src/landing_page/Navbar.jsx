@@ -42,7 +42,7 @@ function Navbar() {
               <li className="nav-item">
                 <a 
                   className="nav-link" 
-                  href="http://localhost:5174"
+                  href="https://stockyard-dashboard.onrender.com"
                   style={{ color: '#387ed1', fontWeight: 'bold' }}
                 >
                   Dashboard →
