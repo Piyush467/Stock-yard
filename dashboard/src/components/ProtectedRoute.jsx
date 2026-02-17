@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
-  // Show loading spinner while checking authentication
+  const LOGIN_URL = 'https://stockyard-frontend-uuyr.onrender.com/login';
+
   if (loading) {
     return (
       <div style={styles.loadingContainer}>
@@ -14,13 +15,11 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // If not authenticated, redirect to frontend login
   if (!user) {
-    window.location.href = 'https://stockyard-frontend-uuyr.onrender.com/login';
+    window.location.href = LOGIN_URL;
     return null;
   }
 
-  // User is authenticated, render the protected content
   return children;
 };
 
@@ -48,7 +47,6 @@ const styles = {
   }
 };
 
-// Add CSS animation for spinner
 const styleSheet = document.createElement('style');
 styleSheet.textContent = `
   @keyframes spin {

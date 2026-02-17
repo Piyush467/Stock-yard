@@ -11,6 +11,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const FRONTEND_LOGIN_URL = 'https://stockyard-frontend-uuyr.onrender.com/login';
+
   useEffect(() => {
     checkUserLoggedIn();
   }, []);
@@ -30,8 +32,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
       setUser(null);
-      // Redirect to frontend login page
-      window.location.href = 'https://stockyard-frontend-uuyr.onrender.com/login';
+      window.location.href = FRONTEND_LOGIN_URL;
     } catch (err) {
       console.error('Logout error:', err);
     }
