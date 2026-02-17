@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');   // ⭐ ADD THIS
+const cors = require('cors');
 
 // Import security middleware
 const { setupSecurity } = require('./middleware/security');
@@ -15,7 +15,7 @@ const { protect } = require('./middleware/auth');
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 
-// Import existing models
+// Import your existing models
 const { HoldingsModel } = require('./model/HoldingsModel');
 const { PositionsModel } = require('./model/PositionsModel');
 const { OrdersModel } = require('./model/OrdersModel');
@@ -25,17 +25,11 @@ const uri = process.env.MONGO_URL;
 
 const app = express();
 
+// TRUST PROXY (Important for Render.com)
+app.set('trust proxy', 1);
+
 // SECURITY MIDDLEWARE (MUST BE FIRST!)
 setupSecurity(app);
-
-// ⭐ ADD CORS HERE
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://stockyard-frontend-uuyr.onrender.com"
-  ],
-  credentials: true
-}));
 
 // BODY PARSERS
 app.use(express.json());
@@ -44,8 +38,10 @@ app.use(cookieParser());
 // CUSTOM SANITIZATION MIDDLEWARE
 const sanitizeInput = (req, res, next) => {
   const sanitize = (obj) => {
-    if (typeof obj !== 'object' || obj === null) return obj;
-
+    if (typeof obj !== 'object' || obj === null) {
+      return obj;
+    }
+    
     for (let key in obj) {
       if (key.startsWith('$')) {
         delete obj[key];
@@ -59,31 +55,26 @@ const sanitizeInput = (req, res, next) => {
   if (req.body) req.body = sanitize(req.body);
   if (req.query) req.query = sanitize(req.query);
   if (req.params) req.params = sanitize(req.params);
-
+  
   next();
 };
 
-// ⭐ APPLY SANITIZATION
 app.use(sanitizeInput);
 
 // AUTH ROUTES (Public)
 app.use('/api/auth', authRoutes);
 
-// EXISTING ROUTES (Protected)
-
-// Holdings
+// YOUR EXISTING ROUTES (Now Protected!)
 app.get("/allHoldings", protect, async (req, res) => {
   let allHoldings = await HoldingsModel.find({});
   res.json(allHoldings);
 });
 
-// Positions
 app.get("/allPositions", protect, async (req, res) => {
   let allPositions = await PositionsModel.find({});
   res.json(allPositions);
 });
 
-// New Order
 app.post("/newOrder", protect, async (req, res) => {
   try {
     const newOrder = new OrdersModel({
@@ -101,15 +92,15 @@ app.post("/newOrder", protect, async (req, res) => {
   }
 });
 
-// TEST ROUTE
+// TEST ROUTE (Public)
 app.get("/", (req, res) => {
   res.json({ message: "Zerodha Clone API is running..." });
 });
 
-// ERROR HANDLER (LAST)
+// ERROR HANDLER (MUST BE LAST!)
 app.use(errorHandler);
 
-// DATABASE CONNECTION
+// DATABASE CONNECTION & SERVER START
 mongoose.connect(uri)
   .then(() => {
     console.log("DB connected");

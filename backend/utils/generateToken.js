@@ -1,22 +1,22 @@
 const jwt = require('jsonwebtoken');
 
 const generateToken = (res, userId) => {
-  // Create JWT token
   const token = jwt.sign(
     { id: userId },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRE }
+    { expiresIn: process.env.JWT_EXPIRE || '7d' }
   );
 
-  // Cookie options
+  const isProduction = process.env.NODE_ENV === 'production';
+
   const cookieOptions = {
-    httpOnly: true,                                    // Cannot be accessed by JavaScript
-    secure: process.env.NODE_ENV === 'production',     // HTTPS only in production
-    sameSite: 'strict',                                // Prevent CSRF attacks
-    maxAge: 7 * 24 * 60 * 60 * 1000                   // 7 days
+    httpOnly: true,
+    secure: isProduction,           // true in production (HTTPS)
+    sameSite: isProduction ? 'none' : 'lax',  // 'none' for cross-origin in production
+    maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
+    path: '/'
   };
 
-  // Set cookie in response
   res.cookie('token', token, cookieOptions);
 
   return token;
