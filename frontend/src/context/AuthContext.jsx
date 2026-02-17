@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.getMe();
       setUser(response.user);
       if (response.user && (window.location.pathname === '/login' || window.location.pathname === '/signup')) {
-        window.location.href = 'http://localhost:5174';
+        window.location.href = 'https://stockyard-dashboard.onrender.com';
       }
     } catch (err) {
       setUser(null);
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const response = await authService.register(userData);
       setUser(response.user);
-      window.location.href = 'http://localhost:5174';
+      window.location.href = 'https://stockyard-dashboard.onrender.com';
       return response;
     } catch (err) {
       const errorMsg = err.response?.data?.message || 
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const response = await authService.login(credentials);
       setUser(response.user);
-      window.location.href = 'http://localhost:5174';
+      window.location.href = 'https://stockyard-dashboard.onrender.com';
       return response;
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Login failed';
