@@ -6,11 +6,18 @@ export default defineConfig({
   server: {
     port: 5174,
     strictPort: true,
-    open: true
+    open: true,
+    host: true
   },
   preview: {
     port: 10000,
-    host: true
+    host: '0.0.0.0',
+    strictPort: true,
+    allowedHosts: [
+      'stockyard-dashboard.onrender.com',
+      '.onrender.com',
+      'localhost'
+    ]
   },
   build: {
     outDir: 'dist',
