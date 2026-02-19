@@ -48,29 +48,37 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (credentials) => {
-    try {
-      setError(null);
-      const response = await authService.login(credentials);
-      setUser(response.user);
-      window.location.href = DASHBOARD_URL;
-      return response;
-    } catch (err) {
-      const errorMsg = err.response?.data?.message || 'Login failed';
-      setError(errorMsg);
-      throw new Error(errorMsg);
-    }
-  };
+ const login = async (credentials) => {
+  try {
+    setError(null);
 
-  const logout = async () => {
-    try {
-      await authService.logout();
-      setUser(null);
-      window.location.href = '/';
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-  };
+    // Step 1: Login (sets cookie)
+    await authService.login(credentials);
+
+    // Step 2: Confirm cookie works
+    const response = await authService.getMe();
+    setUser(response.user);
+
+    // Step 3: Redirect only after confirmation
+    window.location.href = 'https://stockyard-dashboard.onrender.com';
+
+  } catch (err) {
+    const errorMsg = err.response?.data?.message || 'Login failed';
+    setError(errorMsg);
+    throw new Error(errorMsg);
+  }
+};
+
+const logout = async () => {
+  try {
+    await authService.logout();
+    setUser(null);
+    window.location.href = "https://stockyard-frontend-uuyr.onrender.com/";
+  } catch (err) {
+    console.error('Logout error:', err);
+  }
+};
+
 
   const value = {
     user,
