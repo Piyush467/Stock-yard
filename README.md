@@ -123,7 +123,7 @@ cd Stock-yard
    ```bash
    npm start
    ```
-   *The server will run on `http://localhost:3002` with Nodemon monitoring for changes.*
+   *The server will run on `http://localhost:3002` with Nodemon monitoring for change.*
 
 ### 4. Frontend Landing Setup
 1. Open a new terminal and navigate to the frontend directory:
